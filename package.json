@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "devDependencies": {
     "cypress": "^13.16.1",
+    "cypress-iframe": "^1.0.1",
     "typescript": "^5.7.2"
   }
 }

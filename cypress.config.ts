@@ -2,7 +2,7 @@ import { defineConfig } from 'cypress'
 
 export default defineConfig({
   e2e: {
-    // Configure your E2E tests here
+    chromeWebSecurity: false,
     specPattern: "cypress/e2e/**/*.{cy,spec}.{js,ts}"
   },
 })
