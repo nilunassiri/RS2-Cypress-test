@@ -1,3 +1,11 @@
+// --- The navigation logic ---
+Cypress.Commands.add('navigateToSection', (section: string, buttonSelector: string, headerText: string) => {
+    cy.get(buttonSelector).click();
+    cy.url().should('include', `/${section}`);
+    cy.get('h2').should('be.visible').and('have.text', headerText);
+});
+
+
 // --- Add random products to cart ---
 Cypress.Commands.add('addRandomProductsToCart', (numberOfProducts: number) => {
     cy.get('.text-center.col-4')

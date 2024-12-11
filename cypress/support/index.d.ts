@@ -8,5 +8,7 @@ declare namespace Cypress {
         handlePayment(): Chainable<void>;
 
         validatePaymentSuccess(): Chainable<void>;
+
+        navigateToSection(section: string, buttonSelector: string, headerText: string): void
     }
 }
