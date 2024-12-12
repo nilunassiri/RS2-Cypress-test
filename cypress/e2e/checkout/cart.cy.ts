@@ -1,50 +1,42 @@
+import {constants} from "../../support/constants";
+import {selectors} from "../../support/selectors";
+
 describe('Weather Shopper - Sunscreen Shopping and Payment', () => {
-    const selectors = {
-        cartButton: 'button[onclick="goToCart()"]',
-        tableRow: 'tbody tr',
-        cartItemName: 'tbody tr td:first-child',
-        cartItemPrice: 'tbody tr td:nth-child(2)',
-        totalPrice: '#total',
-        checkoutHeading: 'h2',
-        tableHeadingItem: 'table thead tr th:nth-child(1)',
-        tableHeadingPrice: 'table thead tr th:nth-child(2)',
-        stripeButton: '.stripe-button-el > span',
-    };
 
     beforeEach(() => {
-        cy.visit('https://weathershopper.pythonanywhere.com/sunscreen');
+        cy.visit(constants.urls.moisturizer);
         cy.addRandomProductsToCart(2);
-        cy.get(selectors.cartButton).click();
+        cy.get(selectors.cart.cartButton).click();
         cy.url().should('include', '/cart');
-        cy.get(selectors.tableRow).should('have.length.greaterThan', 0);
+        cy.get(selectors.cart.tableRow).should('have.length.greaterThan', 1);
     });
 
     it('should verify elements on the cart page', () => {
         cy.get('table').should('be.visible');
-        cy.get(selectors.tableRow)
+        cy.get(selectors.cart.tableRow)
             .should('exist')
             .and('have.length.greaterThan', 0)
             .then((rows) => {
                 cy.log(`Number of rows in the cart: ${rows.length}`);
             });
 
-        cy.get(selectors.checkoutHeading)
+        cy.get(selectors.cart.checkoutHeading)
             .should('be.visible')
             .and('contain.text', 'Checkout');
 
-        cy.get(selectors.tableHeadingItem)
+        cy.get(selectors.cart.tableHeadingItem)
             .should('be.visible')
             .and('contain.text', 'Item');
 
-        cy.get(selectors.tableHeadingPrice)
+        cy.get(selectors.cart.tableHeadingPrice)
             .should('be.visible')
             .and('contain.text', 'Price');
 
-        cy.get(selectors.totalPrice).invoke('text').then((text) => {
+        cy.get(selectors.cart.totalPrice).invoke('text').then((text) => {
             expect(text.trim()).to.match(/Total: Rupees \d+/);
         });
 
-        cy.get(selectors.stripeButton)
+        cy.get(selectors.cart.stripeButton)
             .should('be.visible')
             .and('contain.text', 'Pay with Card');
     });

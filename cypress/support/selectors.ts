@@ -1,0 +1,31 @@
+export const selectors = {
+    homepage: {
+        temperature: 'span#temperature',
+        moisturizerButton: 'a[href="/moisturizer"]',
+        sunscreenButton: 'a[href="/sunscreen"]',
+        header: 'h2',
+    },
+    products: {
+        productCards: '.text-center.col-4',
+        productImage: 'img',
+        productName: 'p:first-of-type',
+        productPrice: 'p:contains("Price:")',
+        productButton: 'button',
+        cartButton: 'button[onclick="goToCart()"]',
+        tableRow: 'tbody tr',
+        cartItemName: 'tbody tr td:first-child',
+        cartItemPrice: 'tbody tr td:nth-child(2)',
+        totalPrice: '#total',
+    },
+    cart: {
+        cartButton: 'button[onclick="goToCart()"]',
+        tableRow: 'tbody tr',
+        cartItemName: 'tbody tr td:first-child',
+        cartItemPrice: 'tbody tr td:nth-child(2)',
+        totalPrice: '#total',
+        checkoutHeading: 'h2',
+        tableHeadingItem: 'table thead tr th:nth-child(1)',
+        tableHeadingPrice: 'table thead tr th:nth-child(2)',
+        stripeButton: '.stripe-button-el > span',
+    },
+};

@@ -1,2 +1,4 @@
 import 'cypress-iframe';
-import './commands';
+import './commands/cartCommands'
+import './commands/productsCommands'
+import './commands/navigationCommands'

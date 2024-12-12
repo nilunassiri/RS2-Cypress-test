@@ -1,69 +1,62 @@
+import { selectors } from '../../support/selectors';
+import { constants } from '../../support/constants';
+
 describe('Shopping for Moisturizers', () => {
-    const selectors = {
-        productCards: '.text-center.col-4',
-        productImage: 'img',
-        productName: 'p:first-of-type',
-        productPrice: 'p:contains("Price:")',
-        productButton: 'button',
-        cartButton: 'button[onclick="goToCart()"]',
-        tableRow: 'tbody tr',
-        cartItemName: 'tbody tr td:first-child',
-        cartItemPrice: 'tbody tr td:nth-child(2)',
-        totalPrice: '#total',
-    };
-
     beforeEach(() => {
-        cy.visit('https://weathershopper.pythonanywhere.com/moisturizer');
-        cy.verifyProductStructure(selectors);
+        cy.visit(constants.urls.moisturizer);
+
+        cy.verifyProductStructure(selectors.products);
     });
 
-    it('should verify products exist by name', () => {
-        cy.verifyProductsExist('Aloe', selectors);
-        cy.verifyProductsExist('Almond', selectors);
+    it('should verify moisturizer products exist', () => {
+        cy.fixture('productData.json').then((productData) => {
+            productData.moisturizer.forEach((product: any) => {
+                cy.verifyProductsExist(product, selectors.products);
+            });
+        });
     });
 
-    it('should add products, update the cart button, and verify least expensive items in the cart', () => {
-        cy.assertCartButtonText(selectors, 'Empty');
+    it('should add moisturizers, update the cart button, and verify least expensive items in the cart', () => {
+        cy.assertCartButtonText(selectors.products, 'Empty');
 
-        cy.addProductAndCheckCartText('Aloe', selectors, '1 item(s)');
-        cy.addProductAndCheckCartText('Almond', selectors, '2 item(s)');
+        cy.fixture('productData.json').then((productData) => {
+            const moisturizers = productData.moisturizer;
 
-        cy.wrap([]).then((selectedPrices: number[]) => {
-            cy.addLeastExpensiveProduct('Aloe', selectors).then((price) => {
-                cy.log(`Aloe Product Price: ${price}`);
-                selectedPrices.push(price);
-            });
+            cy.addProductAndCheckCartText(moisturizers[0], selectors.products, '1 item(s)');
+            cy.addProductAndCheckCartText(moisturizers[1], selectors.products, '2 item(s)');
 
-            cy.addLeastExpensiveProduct('Almond', selectors).then((price) => {
-                cy.log(`Almond Product Price: ${price}`);
-                selectedPrices.push(price);
-            });
+            cy.wrap([]).then((selectedPrices: number[]) => {
+                cy.addLeastExpensiveProduct(moisturizers[0], selectors.products).then((price) => {
+                    cy.log(`${moisturizers[0]} Product Price: ${price}`);
+                    selectedPrices.push(price);
+                });
 
-            cy.get(selectors.cartButton).should('be.visible').click();
+                cy.addLeastExpensiveProduct(moisturizers[1], selectors.products).then((price) => {
+                    cy.log(`${moisturizers[1]} Product Price: ${price}`);
+                    selectedPrices.push(price);
+                });
 
-            cy.url().should('include', '/cart');
+                cy.get(selectors.products.cartButton).should('be.visible').click();
+                cy.url().should('include', '/cart');
+                cy.get(selectors.products.tableRow).should('have.length', 2);
+                cy.get(selectors.products.cartItemName).should('contain.text', moisturizers[0]).and('contain.text', moisturizers[1]);
 
-            cy.get(selectors.tableRow).should('have.length', 2);
+                cy.get(selectors.products.cartItemPrice).each(($price, index) => {
+                    const actualPrice = parseInt($price.text().trim());
+                    cy.log(`Actual Price in Cart [Item ${index + 1}]: ${actualPrice}`);
+                    expect(actualPrice).to.equal(selectedPrices[index]);
+                });
 
-            cy.get(selectors.cartItemName).should('contain.text', 'Aloe').and('contain.text', 'Almond');
+                cy.wrap(null).then(() => {
+                    const expectedTotal = selectedPrices.reduce((sum, price) => sum + price, 0);
+                    cy.log(`Expected Total: ${expectedTotal}`);
 
-            cy.get(selectors.cartItemPrice).each(($price, index) => {
-                const actualPrice = parseInt($price.text().trim());
-                cy.log(`Actual Price in Cart [Item ${index + 1}]: ${actualPrice}`);
-                // Assert individual price
-                expect(actualPrice).to.equal(selectedPrices[index]);
-            });
-
-            cy.wrap(null).then(() => {
-                const expectedTotal = selectedPrices.reduce((sum, price) => sum + price, 0);
-                cy.log(`Expected Total: ${expectedTotal}`);
-
-                // Assert total price
-                cy.get(selectors.totalPrice).then(($total) => {
-                    const totalText = $total.text().match(/\d+/)?.[0];
-                    const actualTotal = parseInt(totalText || '0');
-                    cy.log(`Actual Total Displayed in Cart: ${actualTotal}`);
-                    expect(actualTotal).to.equal(expectedTotal);
+                    cy.get(selectors.products.totalPrice).then(($total) => {
+                        const totalText = $total.text().match(/\d+/)?.[0];
+                        const actualTotal = parseInt(totalText || '0');
+                        cy.log(`Actual Total Displayed in Cart: ${actualTotal}`);
+                        expect(actualTotal).to.equal(expectedTotal);
+                    });
                 });
             });
         });

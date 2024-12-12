@@ -1,42 +1,27 @@
-describe('Weather Shopper - Homepage', () => {
-    const selectors = {
-        temperature: 'span#temperature',
-        moisturizerButton: 'a[href="/moisturizer"]',
-        sunscreenButton: 'a[href="/sunscreen"]',
-        header: 'h2',
-    };
+import { selectors } from '../../support/selectors';
+import { constants } from '../../support/constants';
 
-    const temperatureRange = {
-        low: 19,
-        high: 34,
-    };
+describe('Weather Shopper - Homepage', () => {
 
     beforeEach(() => {
-        cy.visit('https://weathershopper.pythonanywhere.com/');
+        cy.visit(constants.urls.homepage);
     });
 
-    it('should display the temperature and navigation buttons for Moisturizers and Sunscreens', () => {
-        cy.get(selectors.temperature).should('be.visible');
-
-        cy.get(selectors.moisturizerButton)
-            .should('be.visible')
-            .and('contain', 'Buy moisturizers');
-
-        cy.get(selectors.sunscreenButton)
-            .should('be.visible')
-            .and('contain', 'Buy sunscreens');
+    it('should display temperature and buttons', () => {
+        cy.get(selectors.homepage.temperature).should('be.visible');
+        cy.get(selectors.homepage.moisturizerButton).should('contain', 'Buy moisturizers');
+        cy.get(selectors.homepage.sunscreenButton).should('contain', 'Buy sunscreens');
     });
 
-    it('should navigate to the respective product page based on temperature conditions', () => {
-        cy.get(selectors.temperature).then(($temp) => {
+    it('should navigate based on temperature', () => {
+        cy.get(selectors.homepage.temperature).then(($temp) => {
             const temperature = parseInt($temp.text(), 10);
-
-            if (temperature < temperatureRange.low) {
-                cy.navigateToSection('moisturizer', selectors.moisturizerButton, 'Moisturizers');
-            } else if (temperature > temperatureRange.high) {
-                cy.navigateToSection('sunscreen', selectors.sunscreenButton, 'Sunscreens');
+            if (temperature < constants.temperatureRange.low) {
+                cy.navigateToSection('moisturizer', selectors.homepage.moisturizerButton, 'Moisturizers');
+            } else if (temperature > constants.temperatureRange.high) {
+                cy.navigateToSection('sunscreen', selectors.homepage.sunscreenButton, 'Sunscreens');
             } else {
-                throw new Error(`Temperature (${temperature}) did not fall into a valid range!`);
+                throw new Error(`Temperature (${temperature}) not in valid range!`);
             }
         });
     });
