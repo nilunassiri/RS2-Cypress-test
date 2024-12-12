@@ -44,7 +44,7 @@ describe('Shopping for Sunscreens', () => {
             cy.url().should('include', '/cart');
 
             cy.get(selectors.tableRow).should('have.length', 2);
-            
+
             cy.get(selectors.cartItemName)
                 .should('contain.text', 'SPF-50')
                 .and('contain.text', 'SPF-30');
